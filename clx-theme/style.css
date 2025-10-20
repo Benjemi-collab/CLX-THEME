@@ -1,0 +1,46 @@
+/*
+Theme Name: CLX Theme Pro
+Theme URI: https://benjemi.com
+Author: CLX
+Author URI: https://benjemi.com
+Description: Thème modulaire glass/pills, Hero vidéo 16:9, patterns tabulés, switch REC (dark/light).
+Version: 1.0.0
+Requires at least: 6.6
+Tested up to: 6.6
+Requires PHP: 8.1
+Text Domain: clx
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+*/
+
+:root {
+--clx-bg: #05070a;
+--clx-surface: rgba(16, 22, 32, 0.72);
+--clx-surface-alt: rgba(24, 32, 44, 0.68);
+--clx-line: rgba(255, 255, 255, 0.08);
+--clx-text: #f4f7fb;
+--clx-text-soft: rgba(244, 247, 251, 0.68);
+--clx-accent: #ff4f6d;
+--clx-accent-soft: rgba(255, 79, 109, 0.42);
+--clx-focus: rgba(255, 79, 109, 0.55);
+--clx-shadow: rgba(1, 4, 9, 0.55);
+color-scheme: dark;
+background-color: var(--clx-bg);
+color: var(--clx-text);
+}
+
+[data-theme="light"] {
+--clx-bg: #f6f7fb;
+--clx-surface: rgba(255, 255, 255, 0.82);
+--clx-surface-alt: rgba(255, 255, 255, 0.75);
+--clx-line: rgba(8, 12, 22, 0.12);
+--clx-text: #0a0f1a;
+--clx-text-soft: rgba(10, 15, 26, 0.68);
+--clx-accent: #ff3f5f;
+--clx-accent-soft: rgba(255, 63, 95, 0.32);
+--clx-focus: rgba(32, 104, 255, 0.55);
+--clx-shadow: rgba(8, 12, 22, 0.15);
+color-scheme: light;
+background-color: var(--clx-bg);
+color: var(--clx-text);
+}
