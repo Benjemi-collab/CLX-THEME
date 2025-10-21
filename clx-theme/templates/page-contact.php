@@ -1,15 +1,14 @@
 <?php
 /**
- * Template Name: Contact Page
+ * Template Name: Contact
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
 get_header();
 ?>
-<main id="primary" class="site-main">
-	<?php while ( have_posts() ) : the_post(); ?>
-		<?php the_content(); ?>
-	<?php endwhile; ?>
-</main>
-<?php get_footer(); ?>
+<div class="contact-page">
+<?php get_template_part( 'parts/contact' ); ?>
+</div>
+<?php
+get_footer();

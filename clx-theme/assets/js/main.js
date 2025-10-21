@@ -1,438 +1,251 @@
-(function () {
-    'use strict';
+(function() {
+'use strict';
 
-    function ready(fn) {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', fn);
+var STORAGE_KEY = 'clxTheme';
+var DEFAULT_THEME = 'dark';
+var docElement = document.documentElement;
+
+function readStoredTheme() {
+    try {
+        var stored = window.localStorage.getItem(STORAGE_KEY);
+        if (stored === 'light' || stored === 'dark') {
+            return stored;
+        }
+    } catch (error) {
+        return '';
+    }
+    return '';
+}
+
+function storeTheme(theme) {
+    try {
+        window.localStorage.setItem(STORAGE_KEY, theme);
+    } catch (error) {
+        // Ignore storage failures (private mode, etc.).
+    }
+}
+
+function applyTheme(theme, toggle) {
+    var targetTheme = theme === 'light' ? 'light' : 'dark';
+
+    docElement.setAttribute('data-theme', targetTheme);
+
+    if (toggle) {
+        var isDark = targetTheme === 'dark';
+        toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        if (isDark) {
+            toggle.classList.add('is-on');
         } else {
-            fn();
+            toggle.classList.remove('is-on');
         }
     }
 
-    function closestCard(element) {
-        var node = element;
-        while (node && node !== document.body) {
-            if (node.classList && node.classList.contains('team-card')) {
-                return node;
-            }
-            node = node.parentElement;
-        }
-        return null;
+    storeTheme(targetTheme);
+}
+
+function initThemeToggle() {
+    var toggle = document.getElementById('recToggle');
+    var stored = readStoredTheme();
+    var initialTheme = stored || DEFAULT_THEME;
+
+    applyTheme(initialTheme, toggle);
+
+    if (!toggle) {
+        return;
     }
 
-    ready(function () {
-        var root = document.documentElement;
-        var storageKey = 'clx-theme-mode';
-        var toggles = [
-            document.getElementById('themeToggle'),
-            document.getElementById('themeToggleM')
-        ];
-        var burger = document.getElementById('clx-burger');
-        var drawer = document.getElementById('clx-drawer');
-        var focusableSelectors = 'a[href], button:not([disabled])';
-        var lastFocusedTrigger = null;
-        var currentMode = 'light';
+    toggle.addEventListener('click', function() {
+        var current = docElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        var next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next, toggle);
+    });
+}
 
-        try {
-            var stored = window.localStorage.getItem(storageKey);
-            if (stored === 'cine' || stored === 'light') {
-                currentMode = stored;
-            }
-        } catch (error) {
-            currentMode = 'light';
+function setCardState(card, classes) {
+    card.classList.remove('is-left', 'is-center', 'is-right', 'is-far');
+    for (var i = 0; i < classes.length; i++) {
+        card.classList.add(classes[i]);
+    }
+}
+
+function initPricingSlider() {
+    var track = document.getElementById('clx-pricing-track');
+    if (!track) {
+        return;
+    }
+
+    var cards = track.querySelectorAll('.pricing-card');
+    if (!cards.length) {
+        return;
+    }
+
+    var prev = document.querySelector('.pricing-prev');
+    var next = document.querySelector('.pricing-next');
+    var currentIndex = 1;
+
+    function getRelativeIndex(index) {
+        var length = cards.length;
+        var diff = index - currentIndex;
+        if (diff > length / 2) {
+            diff -= length;
+        } else if (diff < -length / 2) {
+            diff += length;
         }
+        return diff;
+    }
 
-        function updateButton(button, mode) {
-            if (!button) {
-                return;
-            }
-
-            var label = button.querySelector('.pill-switch-label');
-            if (mode === 'cine') {
-                button.setAttribute('aria-pressed', 'true');
-                if (label) {
-                    label.textContent = 'Mode clair';
-                }
+    function applyPositions() {
+        for (var i = 0; i < cards.length; i++) {
+            var card = cards[i];
+            var rel = getRelativeIndex(i);
+            card.setAttribute('aria-selected', 'false');
+            card.setAttribute('tabindex', '-1');
+            if (rel === 0) {
+                setCardState(card, ['is-center']);
+                card.setAttribute('aria-selected', 'true');
+                card.setAttribute('tabindex', '0');
+            } else if (rel === -1 || rel === cards.length - 1) {
+                setCardState(card, ['is-left']);
+            } else if (rel === 1 || rel === -(cards.length - 1)) {
+                setCardState(card, ['is-right']);
             } else {
-                button.setAttribute('aria-pressed', 'false');
-                if (label) {
-                    label.textContent = 'Mode ciné';
-                }
+                setCardState(card, ['is-far']);
             }
         }
+    }
 
-        function applyMode(mode) {
-            var targetMode = mode === 'cine' ? 'cine' : 'light';
-            root.setAttribute('data-theme', targetMode);
-            var index;
-            for (index = 0; index < toggles.length; index += 1) {
-                updateButton(toggles[index], targetMode);
-            }
-
-            try {
-                window.localStorage.setItem(storageKey, targetMode);
-            } catch (error) {
-                // Storage may be unavailable; fail silently.
+    function move(delta) {
+        currentIndex = (currentIndex + delta + cards.length) % cards.length;
+        applyPositions();
+        for (var i = 0; i < cards.length; i++) {
+            if (cards[i].getAttribute('aria-selected') === 'true') {
+                cards[i].focus();
+                break;
             }
         }
+    }
 
-        function toggleMode() {
-            var nextMode = 'cine';
-            if (root.getAttribute('data-theme') === 'cine') {
-                nextMode = 'light';
-            }
+    applyPositions();
 
-            applyMode(nextMode);
-        }
-
-        applyMode(currentMode);
-
-        var i;
-        for (i = 0; i < toggles.length; i += 1) {
-            var button = toggles[i];
-            if (button) {
-                button.addEventListener('click', toggleMode);
-            }
-        }
-
-        function closeDrawer() {
-            if (!drawer || !burger) {
-                return;
-            }
-
-            drawer.classList.remove('is-open');
-            drawer.setAttribute('aria-hidden', 'true');
-            burger.setAttribute('aria-expanded', 'false');
-
-            if (lastFocusedTrigger) {
-                lastFocusedTrigger.focus();
-            }
-        }
-
-        function openDrawer() {
-            if (!drawer || !burger) {
-                return;
-            }
-
-            lastFocusedTrigger = document.activeElement;
-            drawer.classList.add('is-open');
-            drawer.setAttribute('aria-hidden', 'false');
-            burger.setAttribute('aria-expanded', 'true');
-
-            var focusable = drawer.querySelectorAll(focusableSelectors);
-            if (focusable.length > 0) {
-                focusable[0].focus();
-            }
-        }
-
-        if (burger && drawer) {
-            burger.addEventListener('click', function () {
-                if (drawer.classList.contains('is-open')) {
-                    closeDrawer();
-                } else {
-                    openDrawer();
-                }
-            });
-        }
-
-        if (drawer) {
-            drawer.addEventListener('click', function (event) {
-                if (event.target.classList.contains('clx-drawer-link')) {
-                    closeDrawer();
-                }
-            });
-
-            drawer.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape' || event.key === 'Esc') {
-                    closeDrawer();
-                }
-            });
-        }
-
-        document.addEventListener('keydown', function (event) {
-            if ((event.key === 'Escape' || event.key === 'Esc') && drawer && drawer.classList.contains('is-open')) {
-                closeDrawer();
+    if (prev) {
+        prev.addEventListener('click', function() {
+            move(-1);
+        });
+        prev.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                move(-1);
             }
         });
+    }
 
-        function initPricingSlider() {
-            var slider = document.querySelector('.clx-3d-slider');
-            if (!slider) {
-                return;
+    if (next) {
+        next.addEventListener('click', function() {
+            move(1);
+        });
+        next.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                move(1);
             }
+        });
+    }
 
-            var track = slider.querySelector('.clx-3d-track');
-            if (!track) {
-                return;
-            }
-
-            var slides = track.querySelectorAll('.clx-3d-slide');
-            if (slides.length === 0) {
-                return;
-            }
-
-            var prevButton = slider.querySelector('.slider-nav-prev');
-            var nextButton = slider.querySelector('.slider-nav-next');
-            var currentIndex = 0;
-            var total = slides.length;
-            var pointerActive = false;
-            var pointerStartX = 0;
-            var pointerId = null;
-
-            for (i = 0; i < slides.length; i += 1) {
-                slides[i].setAttribute('data-index', String(i));
-                if (slides[i].classList.contains('is-center')) {
-                    currentIndex = i;
-                }
-            }
-
-            function normalize(index) {
-                var result = index % total;
-                if (result < 0) {
-                    result += total;
-                }
-                return result;
-            }
-
-            function applyState() {
-                var idx;
-                for (idx = 0; idx < total; idx += 1) {
-                    var slide = slides[idx];
-                    slide.classList.remove('is-left', 'is-center', 'is-right', 'is-far');
-                    var offset = idx - currentIndex;
-                    if (offset > total / 2) {
-                        offset -= total;
-                    } else if (offset < -total / 2) {
-                        offset += total;
-                    }
-
-                    slide.setAttribute('aria-hidden', 'true');
-                    slide.removeAttribute('aria-current');
-
-                    if (offset === 0) {
-                        slide.classList.add('is-center');
-                        slide.setAttribute('aria-hidden', 'false');
-                        slide.setAttribute('aria-current', 'true');
-                    } else if (offset === -1) {
-                        slide.classList.add('is-left');
-                    } else if (offset === 1) {
-                        slide.classList.add('is-right');
-                    } else {
-                        slide.classList.add('is-far');
-                    }
-                }
-            }
-
-            function goTo(index) {
-                currentIndex = normalize(index);
-                applyState();
-            }
-
-            function goNext() {
-                goTo(currentIndex + 1);
-            }
-
-            function goPrev() {
-                goTo(currentIndex - 1);
-            }
-
-            applyState();
-            track.setAttribute('tabindex', '0');
-
-            if (prevButton) {
-                prevButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    goPrev();
-                });
-            }
-
-            if (nextButton) {
-                nextButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    goNext();
-                });
-            }
-
-            track.addEventListener('keydown', function (event) {
-                if (event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    goNext();
-                } else if (event.key === 'ArrowLeft') {
-                    event.preventDefault();
-                    goPrev();
-                }
-            });
-
-            track.addEventListener('pointerdown', function (event) {
-                pointerActive = true;
-                pointerStartX = event.clientX;
-                pointerId = event.pointerId;
-                track.setPointerCapture(pointerId);
-            });
-
-            track.addEventListener('pointerup', function (event) {
-                if (!pointerActive) {
-                    return;
-                }
-
-                var deltaX = event.clientX - pointerStartX;
-                if (Math.abs(deltaX) > 40) {
-                    if (deltaX < 0) {
-                        goNext();
-                    } else {
-                        goPrev();
-                    }
-                }
-
-                pointerActive = false;
-                if (pointerId !== null) {
-                    track.releasePointerCapture(pointerId);
-                    pointerId = null;
-                }
-            });
-
-            track.addEventListener('pointercancel', function () {
-                pointerActive = false;
-                if (pointerId !== null) {
-                    track.releasePointerCapture(pointerId);
-                    pointerId = null;
-                }
-            });
+    track.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            move(1);
         }
-
-        function initTeamSlider() {
-            var slider = document.querySelector('.team-slider');
-            if (!slider) {
-                return;
-            }
-
-            var track = slider.querySelector('.team-track');
-            if (!track) {
-                return;
-            }
-
-            var cards = track.querySelectorAll('.team-card');
-            if (cards.length === 0) {
-                return;
-            }
-
-            var prevButton = slider.querySelector('.team-nav-prev');
-            var nextButton = slider.querySelector('.team-nav-next');
-
-            function getGap() {
-                var styles = window.getComputedStyle(track);
-                var gapValue = styles.getPropertyValue('column-gap') || styles.getPropertyValue('gap');
-                var parsed = parseFloat(gapValue);
-                if (isNaN(parsed)) {
-                    return 0;
-                }
-                return parsed;
-            }
-
-            function getScrollAmount() {
-                var width = cards[0].offsetWidth;
-                return width + getGap();
-            }
-
-            function updateNav() {
-                if (!prevButton || !nextButton) {
-                    return;
-                }
-
-                var maxScroll = track.scrollWidth - track.clientWidth - 1;
-                var atStart = track.scrollLeft <= 1;
-                var atEnd = track.scrollLeft >= maxScroll;
-
-                prevButton.disabled = atStart;
-                nextButton.disabled = atEnd;
-                prevButton.setAttribute('aria-disabled', atStart ? 'true' : 'false');
-                nextButton.setAttribute('aria-disabled', atEnd ? 'true' : 'false');
-            }
-
-            function scrollByAmount(direction) {
-                var amount = getScrollAmount() * direction;
-                track.scrollBy({ left: amount, behavior: 'smooth' });
-            }
-
-            if (prevButton) {
-                prevButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    scrollByAmount(-1);
-                });
-            }
-
-            if (nextButton) {
-                nextButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    scrollByAmount(1);
-                });
-            }
-
-            track.addEventListener('scroll', function () {
-                window.requestAnimationFrame(updateNav);
-            });
-
-            track.setAttribute('tabindex', '0');
-            track.addEventListener('keydown', function (event) {
-                if (event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    scrollByAmount(1);
-                } else if (event.key === 'ArrowLeft') {
-                    event.preventDefault();
-                    scrollByAmount(-1);
-                }
-            });
-
-            window.addEventListener('resize', function () {
-                window.requestAnimationFrame(updateNav);
-            });
-
-            window.requestAnimationFrame(updateNav);
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            move(-1);
         }
-
-        function initTeamHover() {
-            var images = document.querySelectorAll('.team-image');
-            for (var idx = 0; idx < images.length; idx += 1) {
-                var img = images[idx];
-                var hoverSrc = img.getAttribute('data-hover-src');
-                if (!hoverSrc) {
-                    continue;
-                }
-
-                var baseSrc = img.getAttribute('src');
-                var baseAlt = img.getAttribute('data-base-alt') || img.getAttribute('alt') || '';
-                var hoverAlt = img.getAttribute('data-hover-alt') || baseAlt;
-                img.dataset.baseSrc = baseSrc;
-                img.dataset.baseAlt = baseAlt;
-
-                var card = img.closest ? img.closest('.team-card') : closestCard(img);
-                if (!card) {
-                    continue;
-                }
-
-                (function (imageElement, hoverImage, baseImageSrc, baseImageAlt, hoverImageAlt) {
-                    function activateHover() {
-                        imageElement.setAttribute('src', hoverImage);
-                        imageElement.setAttribute('alt', hoverImageAlt || baseImageAlt);
-                    }
-
-                    function resetHover() {
-                        var originalSrc = imageElement.dataset.baseSrc || baseImageSrc;
-                        var originalAlt = imageElement.dataset.baseAlt || baseImageAlt;
-                        imageElement.setAttribute('src', originalSrc);
-                        imageElement.setAttribute('alt', originalAlt);
-                    }
-
-                    card.addEventListener('mouseenter', activateHover);
-                    card.addEventListener('mouseleave', resetHover);
-                    card.addEventListener('focusin', activateHover);
-                    card.addEventListener('focusout', resetHover);
-                })(img, hoverSrc, baseSrc, baseAlt, hoverAlt);
-            }
-        }
-
-        initPricingSlider();
-        initTeamSlider();
-        initTeamHover();
     });
+}
+
+function initTeamCarousel() {
+    var carousel = document.querySelector('.team-carousel');
+    if (!carousel) {
+        return;
+    }
+
+    var cards = carousel.querySelectorAll('.team-card');
+    carousel.setAttribute('tabindex', '0');
+
+    var handleHover = function(event) {
+        var target = event.currentTarget;
+        var hoverSrc = target.getAttribute('data-hover-src');
+        var hoverAlt = target.getAttribute('data-hover-alt');
+        if (!hoverSrc) {
+            return;
+        }
+
+        var originalSrc = target.getAttribute('data-original-src');
+        if (!originalSrc) {
+            target.setAttribute('data-original-src', target.getAttribute('src'));
+            target.setAttribute('data-original-alt', target.getAttribute('alt'));
+        }
+
+        target.setAttribute('src', hoverSrc);
+        if (hoverAlt) {
+            target.setAttribute('alt', hoverAlt);
+        }
+    };
+
+    var handleLeave = function(event) {
+        var target = event.currentTarget;
+        var originalSrc = target.getAttribute('data-original-src');
+        if (!originalSrc) {
+            return;
+        }
+
+        target.setAttribute('src', originalSrc);
+        var originalAlt = target.getAttribute('data-original-alt');
+        if (originalAlt) {
+            target.setAttribute('alt', originalAlt);
+        }
+    };
+
+    for (var i = 0; i < cards.length; i++) {
+        var img = cards[i].querySelector('.team-photo');
+        if (!img) {
+            continue;
+        }
+
+        img.addEventListener('mouseenter', handleHover);
+        img.addEventListener('focus', handleHover);
+        img.addEventListener('mouseleave', handleLeave);
+        img.addEventListener('blur', handleLeave);
+    }
+
+    carousel.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            carousel.scrollBy({ left: carousel.clientWidth * 0.7, behavior: 'smooth' });
+        }
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            carousel.scrollBy({ left: carousel.clientWidth * -0.7, behavior: 'smooth' });
+        }
+    });
+}
+
+function initReducedMotion() {
+    if (!window.matchMedia) {
+        return;
+    }
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduced.matches) {
+        docElement.classList.add('clx-reduced-motion');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initThemeToggle();
+    initPricingSlider();
+    initTeamCarousel();
+    initReducedMotion();
+});
+
 })();

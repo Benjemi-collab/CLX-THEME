@@ -2,12 +2,12 @@
 /**
  * Front page template.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
 get_header();
 ?>
-<main id="primary" class="site-main">
+<main id="primary" class="front-page" role="main">
 	<?php
 	get_template_part( 'parts/hero' );
 	get_template_part( 'parts/approach' );
@@ -18,4 +18,6 @@ get_header();
 	get_template_part( 'parts/contact' );
 	?>
 </main>
-<?php get_footer(); ?>
+<?php
+get_footer();
+?>

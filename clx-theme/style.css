@@ -1,14 +1,50 @@
 /*
 Theme Name: CLX Theme Pro
-Theme URI: https://clx.example.com/theme-pro
-Author: CLX Agency
-Author URI: https://clx.example.com
-Description: Premium glass-inspired marketing theme for CLX Agency.
+Theme URI: https://benjemi.com
+Author: CLX
+Author URI: https://benjemi.com
+Description: Thème modulaire glass/pills, Hero vidéo 16:9, patterns tabulés, switch REC (dark/light).
 Version: 1.0.0
 Requires at least: 6.6
 Tested up to: 6.6
 Requires PHP: 8.1
 Text Domain: clx
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
-/* Main stylesheet enqueued via assets/css/main.css */
+:root {
+--bg: #050507;
+--surface: rgba(18, 18, 22, 0.7);
+--surface-strong: rgba(34, 34, 42, 0.85);
+--text: #f6f6f8;
+--text-soft: #c8c8d2;
+--accent: #ff3b58;
+--accent-soft: rgba(255, 59, 88, 0.16);
+--line: rgba(255, 255, 255, 0.08);
+--line-strong: rgba(255, 255, 255, 0.16);
+--glass: rgba(22, 22, 28, 0.68);
+--shadow: 0 24px 80px rgba(5, 5, 10, 0.55);
+--shadow-soft: 0 16px 48px rgba(4, 4, 8, 0.42);
+--hero-glow: linear-gradient(180deg, rgba(5, 5, 7, 0) 0%, rgba(5, 5, 7, 0.88) 100%);
+--font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+--font-display: "Sora", "Inter", system-ui, -apple-system, sans-serif;
+color-scheme: dark;
+}
+
+[data-theme="light"] {
+--bg: #f4f6fb;
+--surface: rgba(255, 255, 255, 0.88);
+--surface-strong: rgba(255, 255, 255, 0.94);
+--text: #12131a;
+--text-soft: #3a3d4d;
+--accent: #ff3b58;
+--accent-soft: rgba(255, 59, 88, 0.12);
+--line: rgba(12, 14, 20, 0.08);
+--line-strong: rgba(12, 14, 20, 0.16);
+--glass: rgba(255, 255, 255, 0.76);
+--shadow: 0 24px 80px rgba(23, 28, 40, 0.12);
+--shadow-soft: 0 16px 48px rgba(23, 28, 40, 0.08);
+--hero-glow: linear-gradient(180deg, rgba(244, 246, 251, 0) 0%, rgba(244, 246, 251, 0.92) 100%);
+color-scheme: light;
+}
