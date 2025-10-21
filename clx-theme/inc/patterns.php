@@ -1,93 +1,91 @@
 <?php
 /**
- * Block patterns registration.
+ * Block pattern registration.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
-if ( ! function_exists( 'clx_register_block_patterns' ) ) {
-    /**
-     * Register CLX block patterns from HTML files.
-     */
-    function clx_register_block_patterns() {
-        if ( ! function_exists( 'register_block_pattern' ) ) {
-            return;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Retrieve pattern file contents.
+ *
+ * @param string $slug Pattern slug.
+ * @return string
+ */
+function clx_get_pattern_content( string $slug ): string {
+    $path = trailingslashit( get_template_directory() ) . 'patterns/' . $slug . '.html';
+
+    if ( ! file_exists( $path ) ) {
+        return '';
+    }
+
+    $content = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+    return is_string( $content ) ? $content : '';
+}
+
+/**
+ * Register theme block patterns.
+ */
+function clx_register_block_patterns(): void {
+    if ( ! function_exists( 'register_block_pattern' ) ) {
+        return;
+    }
+
+    register_block_pattern_category( 'clx', array(
+        'label' => __( 'CLX', 'clx' ),
+    ) );
+
+    $patterns = array(
+        'hero'     => array(
+            'title'       => __( 'Hero vidéo 16:9', 'clx' ),
+            'description' => __( 'Hero vidéo avec gradient ciné et CTA pills.', 'clx' ),
+        ),
+        'approach' => array(
+            'title'       => __( 'Approche orchestrée', 'clx' ),
+            'description' => __( 'Trois phases glass détaillant la méthode CLX.', 'clx' ),
+        ),
+        'pricing'  => array(
+            'title'       => __( 'Slider tarifs 3D', 'clx' ),
+            'description' => __( 'Cartes packs studios avec CTA.', 'clx' ),
+        ),
+        'showreel' => array(
+            'title'       => __( 'Showreel ciné', 'clx' ),
+            'description' => __( 'Présentation du showreel et CTA visionnage.', 'clx' ),
+        ),
+        'logos'    => array(
+            'title'       => __( 'Mur de logos', 'clx' ),
+            'description' => __( 'Grille de partenaires en mode glass.', 'clx' ),
+        ),
+        'team'     => array(
+            'title'       => __( 'Crew créatif', 'clx' ),
+            'description' => __( 'Carousel horizontal des talents.', 'clx' ),
+        ),
+        'contact'  => array(
+            'title'       => __( 'Contact studio', 'clx' ),
+            'description' => __( 'Coordonnées et formulaire pill glass.', 'clx' ),
+        ),
+    );
+
+    foreach ( $patterns as $slug => $data ) {
+        $content = clx_get_pattern_content( $slug );
+
+        if ( ! $content ) {
+            continue;
         }
 
-        if ( function_exists( 'register_block_pattern_category' ) && class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-            $registry = WP_Block_Pattern_Categories_Registry::get_instance();
-
-            if ( ! $registry->is_registered( 'clx' ) ) {
-                register_block_pattern_category(
-                    'clx',
-                    [
-                        'label' => __( 'Sections CLX', 'clx' ),
-                    ]
-                );
-            }
-        }
-
-        $patterns = [
-            'clx/hero'     => [
-                'title'       => __( 'Hero vidéo CLX', 'clx' ),
-                'description' => __( 'Section hero 16:9 avec vidéo immersive.', 'clx' ),
-                'file'        => 'hero.html',
-            ],
-            'clx/approach' => [
-                'title'       => __( 'Approche CLX en 3 phases', 'clx' ),
-                'description' => __( 'Cartes pour détailler votre méthode.', 'clx' ),
-                'file'        => 'approach.html',
-            ],
-            'clx/pricing'  => [
-                'title'       => __( 'Slider pricing 3D', 'clx' ),
-                'description' => __( 'Formules marketing en slider 3D.', 'clx' ),
-                'file'        => 'pricing.html',
-            ],
-            'clx/showreel' => [
-                'title'       => __( 'Showreel vidéo', 'clx' ),
-                'description' => __( 'Bloc vidéo pour présenter vos productions.', 'clx' ),
-                'file'        => 'showreel.html',
-            ],
-            'clx/logos'    => [
-                'title'       => __( 'Logos clients CLX', 'clx' ),
-                'description' => __( 'Grille de références clients.', 'clx' ),
-                'file'        => 'logos.html',
-            ],
-            'clx/team'     => [
-                'title'       => __( 'Slider équipe CLX', 'clx' ),
-                'description' => __( 'Présentation de l\'équipe studio & growth.', 'clx' ),
-                'file'        => 'team.html',
-            ],
-            'clx/contact'  => [
-                'title'       => __( 'Formulaire contact CLX', 'clx' ),
-                'description' => __( 'Bloc contact glass + formulaire.', 'clx' ),
-                'file'        => 'contact.html',
-            ],
-        ];
-
-        foreach ( $patterns as $slug => $pattern ) {
-            $file_path = trailingslashit( CLX_THEME_DIR ) . 'patterns/' . $pattern['file'];
-
-            if ( ! file_exists( $file_path ) ) {
-                continue;
-            }
-
-            $content = file_get_contents( $file_path );
-
-            if ( false === $content ) {
-                continue;
-            }
-
-            register_block_pattern(
-                $slug,
-                [
-                    'title'       => $pattern['title'],
-                    'description' => $pattern['description'],
-                    'categories'  => [ 'clx' ],
-                    'content'     => wp_kses_post( $content ),
-                ]
-            );
-        }
+        register_block_pattern(
+            'clx/' . $slug,
+            array(
+                'title'       => $data['title'],
+                'description' => $data['description'],
+                'categories'  => array( 'clx' ),
+                'content'     => $content,
+            )
+        );
     }
 }
 add_action( 'init', 'clx_register_block_patterns' );

@@ -2,148 +2,76 @@
 /**
  * Helper functions.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
-if ( ! function_exists( 'clx_get_asset_path' ) ) {
-    /**
-     * Retrieve the absolute path to a theme asset.
-     *
-     * @param string $relative Relative path from the theme root.
-     * @return string Absolute path.
-     */
-    function clx_get_asset_path( $relative ) {
-        $relative = ltrim( (string) $relative, '/' );
-
-        return trailingslashit( CLX_THEME_DIR ) . $relative;
-    }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-if ( ! function_exists( 'clx_get_asset_uri' ) ) {
-    /**
-     * Retrieve the URI to a theme asset.
-     *
-     * @param string $relative Relative path from the theme root.
-     * @return string Asset URI.
-     */
-    function clx_get_asset_uri( $relative ) {
-        $relative = ltrim( (string) $relative, '/' );
+/**
+ * Retrieve a sanitized theme mod string.
+ *
+ * @param string $name    Theme mod key.
+ * @param string $default Default value.
+ * @return string
+ */
+function clx_get_theme_string( string $name, string $default = '' ): string {
+	$value = get_theme_mod( $name, $default );
 
-        return trailingslashit( CLX_THEME_URI ) . $relative;
-    }
+	if ( is_string( $value ) || is_numeric( $value ) ) {
+		return (string) $value;
+	}
+
+	return $default;
 }
 
-if ( ! function_exists( 'clx_get_asset_version' ) ) {
-    /**
-     * Determine the version hash for an asset based on filemtime.
-     *
-     * @param string $relative Relative path from the theme root.
-     * @return string Version string.
-     */
-    function clx_get_asset_version( $relative ) {
-        $path = clx_get_asset_path( $relative );
+/**
+ * Get an attachment image data set.
+ *
+ * @param int    $attachment_id Attachment ID.
+ * @param string $size          Image size.
+ * @return array{src:string,srcset:string,sizes:string,alt:string}
+ */
+function clx_get_image_data( int $attachment_id, string $size = 'full' ): array {
+	$attachment_id = absint( $attachment_id );
 
-        if ( file_exists( $path ) ) {
-            return (string) filemtime( $path );
-        }
+	if ( ! $attachment_id ) {
+		return array(
+			'src'    => '',
+			'srcset' => '',
+			'sizes'  => '',
+			'alt'    => '',
+		);
+	}
 
-        return CLX_THEME_VERSION;
-    }
+	$image  = wp_get_attachment_image_src( $attachment_id, $size );
+	$srcset = wp_get_attachment_image_srcset( $attachment_id, $size ) ?: '';
+	$sizes  = wp_get_attachment_image_sizes( $attachment_id, $size ) ?: '';
+	$alt    = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+
+	return array(
+		'src'    => $image ? (string) $image[0] : '',
+		'srcset' => (string) $srcset,
+		'sizes'  => (string) $sizes,
+		'alt'    => $alt ? sanitize_text_field( $alt ) : '',
+	);
 }
 
-if ( ! function_exists( 'clx_attachment_url' ) ) {
-    /**
-     * Safely retrieve an attachment URL.
-     *
-     * @param int    $attachment_id Attachment ID.
-     * @param string $size          Image size.
-     * @return string Attachment URL or empty string.
-     */
-    function clx_attachment_url( $attachment_id, $size = 'full' ) {
-        $attachment_id = absint( $attachment_id );
+/**
+ * Retrieve an attachment URL for media (video/audio/etc.).
+ *
+ * @param int $attachment_id Attachment ID.
+ * @return string
+ */
+function clx_get_media_url( int $attachment_id ): string {
+	$attachment_id = absint( $attachment_id );
 
-        if ( 0 === $attachment_id ) {
-            return '';
-        }
+	if ( ! $attachment_id ) {
+		return '';
+	}
 
-        $url = wp_get_attachment_image_url( $attachment_id, $size );
+	$url = wp_get_attachment_url( $attachment_id );
 
-        return $url ? $url : '';
-    }
-}
-
-if ( ! function_exists( 'clx_sanitize_media_id' ) ) {
-    /**
-     * Sanitize attachment IDs.
-     *
-     * @param mixed $value Value to sanitize.
-     * @return int Sanitized attachment ID.
-     */
-    function clx_sanitize_media_id( $value ) {
-        return absint( $value );
-    }
-}
-
-if ( ! function_exists( 'clx_sanitize_checkbox' ) ) {
-    /**
-     * Sanitize checkbox values.
-     *
-     * @param mixed $value Value to sanitize.
-     * @return bool Boolean value.
-     */
-    function clx_sanitize_checkbox( $value ) {
-        return (bool) $value;
-    }
-}
-
-if ( ! function_exists( 'clx_sanitize_text' ) ) {
-    /**
-     * Sanitize text fields.
-     *
-     * @param string $value Input text.
-     * @return string Sanitized text.
-     */
-    function clx_sanitize_text( $value ) {
-        return sanitize_text_field( (string) $value );
-    }
-}
-
-if ( ! function_exists( 'clx_media_url' ) ) {
-    /**
-     * Retrieve a generic media URL.
-     *
-     * @param int $attachment_id Attachment ID.
-     * @return string Media URL.
-     */
-    function clx_media_url( $attachment_id ) {
-        $attachment_id = absint( $attachment_id );
-
-        if ( 0 === $attachment_id ) {
-            return '';
-        }
-
-        $url = wp_get_attachment_url( $attachment_id );
-
-        return $url ? $url : '';
-    }
-}
-
-if ( ! function_exists( 'clx_attachment_alt' ) ) {
-    /**
-     * Retrieve attachment alt text.
-     *
-     * @param int $attachment_id Attachment ID.
-     * @return string Alt text.
-     */
-    function clx_attachment_alt( $attachment_id ) {
-        $attachment_id = absint( $attachment_id );
-
-        if ( 0 === $attachment_id ) {
-            return '';
-        }
-
-        $alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-
-        return $alt ? $alt : '';
-    }
+	return $url ? (string) $url : '';
 }
