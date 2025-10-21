@@ -1,281 +1,231 @@
 <?php
 /**
- * Custom post types and meta handling.
+ * Custom post types for CLX theme.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
-if ( ! function_exists( 'clx_register_custom_post_types' ) ) {
-    /**
-     * Register CLX custom post types.
-     */
-    function clx_register_custom_post_types() {
-        $shared_labels = [
-            'public'             => true,
-            'publicly_queryable' => false,
-            'show_ui'           => true,
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Register custom post types and meta.
+ */
+function clx_register_cpts(): void {
+    $logo_labels = array(
+        'name'               => __( 'Logos', 'clx' ),
+        'singular_name'      => __( 'Logo', 'clx' ),
+        'menu_name'          => __( 'Logos CLX', 'clx' ),
+        'add_new'            => __( 'Ajouter un logo', 'clx' ),
+        'add_new_item'       => __( 'Ajouter un logo partenaire', 'clx' ),
+        'edit_item'          => __( 'Modifier le logo', 'clx' ),
+        'new_item'           => __( 'Nouveau logo', 'clx' ),
+        'view_item'          => __( 'Voir le logo', 'clx' ),
+        'search_items'       => __( 'Rechercher un logo', 'clx' ),
+        'not_found'          => __( 'Aucun logo trouvé.', 'clx' ),
+        'not_found_in_trash' => __( 'Aucun logo dans la corbeille.', 'clx' ),
+    );
+
+    $logo_args = array(
+        'labels'             => $logo_labels,
+        'public'             => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_position'      => 22,
+        'menu_icon'          => 'dashicons-awards',
+        'supports'           => array( 'title', 'thumbnail' ),
+        'show_in_rest'       => true,
+        'hierarchical'       => false,
+    );
+
+    register_post_type( 'clx_logo', $logo_args );
+
+    $team_labels = array(
+        'name'               => __( 'Équipe', 'clx' ),
+        'singular_name'      => __( 'Talent', 'clx' ),
+        'menu_name'          => __( 'Crew CLX', 'clx' ),
+        'add_new'            => __( 'Ajouter un talent', 'clx' ),
+        'add_new_item'       => __( 'Ajouter un membre de l’équipe', 'clx' ),
+        'edit_item'          => __( 'Modifier le talent', 'clx' ),
+        'new_item'           => __( 'Nouveau talent', 'clx' ),
+        'view_item'          => __( 'Voir le talent', 'clx' ),
+        'search_items'       => __( 'Rechercher un talent', 'clx' ),
+        'not_found'          => __( 'Aucun talent trouvé.', 'clx' ),
+        'not_found_in_trash' => __( 'Aucun talent dans la corbeille.', 'clx' ),
+    );
+
+    $team_args = array(
+        'labels'             => $team_labels,
+        'public'             => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_position'      => 23,
+        'menu_icon'          => 'dashicons-groups',
+        'supports'           => array( 'title', 'thumbnail', 'editor' ),
+        'show_in_rest'       => true,
+        'hierarchical'       => false,
+    );
+
+    register_post_type( 'clx_team', $team_args );
+
+    register_post_meta(
+        'clx_logo',
+        'logo_url',
+        array(
+            'type'              => 'string',
+            'single'            => true,
+            'sanitize_callback' => 'esc_url_raw',
+            'show_in_rest'      => array(
+                'schema' => array(
+                    'type'   => 'string',
+                    'format' => 'uri',
+                ),
+            ),
+            'auth_callback'     => 'clx_meta_edit_capability',
+        )
+    );
+
+    register_post_meta(
+        'clx_team',
+        'team_role',
+        array(
+            'type'              => 'string',
+            'single'            => true,
+            'sanitize_callback' => 'sanitize_text_field',
             'show_in_rest'      => true,
-            'show_in_nav_menus' => false,
-            'exclude_from_search' => true,
-            'supports'         => [ 'title', 'thumbnail', 'editor' ],
-            'has_archive'      => false,
-            'rewrite'          => false,
-        ];
+            'auth_callback'     => 'clx_meta_edit_capability',
+        )
+    );
 
-        register_post_type(
-            'clx_logo',
-            wp_parse_args(
-                [
-                    'labels' => [
-                        'name'          => __( 'Logos', 'clx' ),
-                        'singular_name' => __( 'Logo', 'clx' ),
-                        'add_new_item'  => __( 'Ajouter un logo client', 'clx' ),
-                        'edit_item'     => __( 'Modifier le logo', 'clx' ),
-                    ],
-                    'menu_icon' => 'dashicons-awards',
-                    'supports'  => [ 'title', 'thumbnail' ],
-                ],
-                $shared_labels
-            )
-        );
-
-        register_post_type(
-            'clx_team',
-            wp_parse_args(
-                [
-                    'labels' => [
-                        'name'          => __( 'Équipe CLX', 'clx' ),
-                        'singular_name' => __( 'Membre de l\'équipe', 'clx' ),
-                        'add_new_item'  => __( 'Ajouter un talent', 'clx' ),
-                        'edit_item'     => __( 'Modifier le talent', 'clx' ),
-                    ],
-                    'menu_icon' => 'dashicons-groups',
-                    'supports'  => [ 'title', 'thumbnail', 'editor' ],
-                ],
-                $shared_labels
-            )
-        );
-    }
+    register_post_meta(
+        'clx_team',
+        'team_hover_id',
+        array(
+            'type'              => 'integer',
+            'single'            => true,
+            'sanitize_callback' => 'absint',
+            'show_in_rest'      => array(
+                'schema' => array(
+                    'type' => 'integer',
+                ),
+            ),
+            'auth_callback'     => 'clx_meta_edit_capability',
+        )
+    );
 }
-add_action( 'init', 'clx_register_custom_post_types' );
+add_action( 'init', 'clx_register_cpts' );
 
-if ( ! function_exists( 'clx_register_cpt_meta' ) ) {
-    /**
-     * Register CPT meta fields.
-     */
-    function clx_register_cpt_meta() {
-        register_post_meta(
-            'clx_logo',
-            'clx_logo_url',
-            [
-                'single'            => true,
-                'type'              => 'string',
-                'sanitize_callback' => 'esc_url_raw',
-                'show_in_rest'      => true,
-                'auth_callback'     => function() {
-                    return current_user_can( 'edit_posts' );
-                },
-            ]
-        );
+/**
+ * Control access to editing custom meta.
+ *
+ * @param bool   $allowed Whether the edit is allowed.
+ * @param string $meta_key Meta key.
+ * @param int    $post_id Post ID.
+ * @param int    $user_id User ID.
+ * @param string $cap Capability.
+ * @param array  $caps Capabilities.
+ * @return bool
+ */
+function clx_meta_edit_capability( $allowed, $meta_key, $post_id, $user_id, $cap, $caps ) {
+    unset( $meta_key, $user_id, $cap, $caps );
 
-        register_post_meta(
-            'clx_team',
-            'clx_team_role',
-            [
-                'single'            => true,
-                'type'              => 'string',
-                'sanitize_callback' => 'sanitize_text_field',
-                'show_in_rest'      => true,
-                'auth_callback'     => function() {
-                    return current_user_can( 'edit_posts' );
-                },
-            ]
-        );
-
-        register_post_meta(
-            'clx_team',
-            'clx_team_hover_id',
-            [
-                'single'            => true,
-                'type'              => 'integer',
-                'sanitize_callback' => 'clx_sanitize_media_id',
-                'show_in_rest'      => [
-                    'schema' => [
-                        'type' => 'integer',
-                    ],
-                ],
-                'auth_callback'     => function() {
-                    return current_user_can( 'edit_posts' );
-                },
-            ]
-        );
-    }
+    return current_user_can( 'edit_post', $post_id );
 }
-add_action( 'init', 'clx_register_cpt_meta' );
 
-if ( ! function_exists( 'clx_add_cpt_meta_boxes' ) ) {
-    /**
-     * Register meta boxes for CPTs.
-     */
-    function clx_add_cpt_meta_boxes() {
-        add_meta_box(
-            'clx_logo_details',
-            __( 'Lien du logo', 'clx' ),
-            'clx_render_logo_metabox',
-            'clx_logo',
-            'normal',
-            'default'
-        );
-
-        add_meta_box(
-            'clx_team_details',
-            __( 'Détails du membre', 'clx' ),
-            'clx_render_team_metabox',
-            'clx_team',
-            'normal',
-            'default'
-        );
-    }
+/**
+ * Register meta boxes for CPT fields.
+ */
+function clx_add_cpt_meta_boxes(): void {
+    add_meta_box( 'clx_logo_meta', __( 'Lien partenaire', 'clx' ), 'clx_render_logo_meta_box', 'clx_logo', 'normal', 'default' );
+    add_meta_box( 'clx_team_meta', __( 'Infos talent', 'clx' ), 'clx_render_team_meta_box', 'clx_team', 'normal', 'default' );
 }
 add_action( 'add_meta_boxes', 'clx_add_cpt_meta_boxes' );
 
-if ( ! function_exists( 'clx_render_logo_metabox' ) ) {
-    /**
-     * Render logo meta box.
-     *
-     * @param WP_Post $post Current post.
-     */
-    function clx_render_logo_metabox( $post ) {
-        $logo_url = get_post_meta( $post->ID, 'clx_logo_url', true );
+/**
+ * Render logo meta box.
+ *
+ * @param WP_Post $post Post object.
+ */
+function clx_render_logo_meta_box( $post ): void {
+    wp_nonce_field( 'clx_logo_meta', 'clx_logo_meta_nonce' );
 
-        wp_nonce_field( 'clx_save_logo_meta', 'clx_logo_nonce' );
-        ?>
-        <p>
-            <label for="clx_logo_url" class="screen-reader-text"><?php esc_html_e( 'URL du site client', 'clx' ); ?></label>
-            <input type="url" class="widefat" id="clx_logo_url" name="clx_logo_url" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://" />
-        </p>
-        <p class="description"><?php esc_html_e( 'Optionnel : lien vers la page client ou la campagne.', 'clx' ); ?></p>
-        <?php
-    }
+    $logo_url = get_post_meta( $post->ID, 'logo_url', true );
+    ?>
+    <p>
+        <label for="clx-logo-url"><?php esc_html_e( 'URL partenaire', 'clx' ); ?></label>
+        <input type="url" class="widefat" id="clx-logo-url" name="clx_logo_url" value="<?php echo esc_attr( $logo_url ); ?>" placeholder="https://">
+    </p>
+    <?php
 }
 
-if ( ! function_exists( 'clx_render_team_metabox' ) ) {
-    /**
-     * Render team meta box.
-     *
-     * @param WP_Post $post Current post.
-     */
-    function clx_render_team_metabox( $post ) {
-        $team_role     = get_post_meta( $post->ID, 'clx_team_role', true );
-        $team_hover_id = absint( get_post_meta( $post->ID, 'clx_team_hover_id', true ) );
-        $hover_preview = $team_hover_id ? wp_get_attachment_image( $team_hover_id, 'thumbnail' ) : '';
+/**
+ * Render team meta box.
+ *
+ * @param WP_Post $post Post object.
+ */
+function clx_render_team_meta_box( $post ): void {
+    wp_nonce_field( 'clx_team_meta', 'clx_team_meta_nonce' );
 
-        wp_nonce_field( 'clx_save_team_meta', 'clx_team_nonce' );
-        ?>
-        <p>
-            <label for="clx_team_role" class="screen-reader-text"><?php esc_html_e( 'Rôle', 'clx' ); ?></label>
-            <input type="text" class="widefat" id="clx_team_role" name="clx_team_role" value="<?php echo esc_attr( $team_role ); ?>" placeholder="<?php esc_attr_e( 'Creative director, Producteur...', 'clx' ); ?>" />
-        </p>
-        <hr />
-        <p>
-            <strong><?php esc_html_e( 'Image au survol', 'clx' ); ?></strong>
-        </p>
-        <input type="hidden" id="clx_team_hover_id" name="clx_team_hover_id" value="<?php echo esc_attr( $team_hover_id ); ?>" />
-        <div class="clx-media-actions">
-            <button type="button" class="button clx-media-select" data-target="clx_team_hover_id" data-preview="clx_team_hover_preview" data-frame-title="<?php esc_attr_e( 'Sélectionner une image de survol', 'clx' ); ?>" data-button-text="<?php esc_attr_e( 'Utiliser cette image', 'clx' ); ?>"><?php esc_html_e( 'Choisir une image', 'clx' ); ?></button>
-            <button type="button" class="button clx-media-clear" data-target="clx_team_hover_id" data-preview="clx_team_hover_preview"><?php esc_html_e( 'Retirer', 'clx' ); ?></button>
-        </div>
-        <div id="clx_team_hover_preview" class="clx-media-preview">
-            <?php echo $hover_preview; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-        </div>
-        <?php
-    }
+    $team_role   = get_post_meta( $post->ID, 'team_role', true );
+    $hover_image = absint( get_post_meta( $post->ID, 'team_hover_id', true ) );
+    ?>
+    <p>
+        <label for="clx-team-role"><?php esc_html_e( 'Rôle / spécialité', 'clx' ); ?></label>
+        <input type="text" class="widefat" id="clx-team-role" name="clx_team_role" value="<?php echo esc_attr( $team_role ); ?>" placeholder="Réalisation live, DOP, Motion..."></p>
+    <p>
+        <label for="clx-team-hover"><?php esc_html_e( 'ID image hover (optionnel)', 'clx' ); ?></label>
+        <input type="number" class="small-text" id="clx-team-hover" name="clx_team_hover_id" value="<?php echo esc_attr( $hover_image ); ?>" min="0">
+        <br><span class="description"><?php esc_html_e( 'ID de la media library pour la photo alternative.', 'clx' ); ?></span>
+    </p>
+    <?php
 }
 
-if ( ! function_exists( 'clx_save_logo_meta' ) ) {
-    /**
-     * Save logo meta.
-     *
-     * @param int $post_id Post ID.
-     */
-    function clx_save_logo_meta( $post_id ) {
-        if ( ! isset( $_POST['clx_logo_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clx_logo_nonce'] ) ), 'clx_save_logo_meta' ) ) {
-            return;
-        }
-
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-            return;
-        }
-
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return;
-        }
-
-        if ( isset( $_POST['clx_logo_url'] ) ) {
-            $logo_url = esc_url_raw( wp_unslash( $_POST['clx_logo_url'] ) );
-            update_post_meta( $post_id, 'clx_logo_url', $logo_url );
-        }
+/**
+ * Save logo meta data.
+ *
+ * @param int $post_id Post ID.
+ */
+function clx_save_logo_meta( int $post_id ): void {
+    if ( ! isset( $_POST['clx_logo_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clx_logo_meta_nonce'] ) ), 'clx_logo_meta' ) ) {
+        return;
     }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $logo_url = isset( $_POST['clx_logo_url'] ) ? esc_url_raw( wp_unslash( $_POST['clx_logo_url'] ) ) : '';
+    update_post_meta( $post_id, 'logo_url', $logo_url );
 }
 add_action( 'save_post_clx_logo', 'clx_save_logo_meta' );
 
-if ( ! function_exists( 'clx_save_team_meta' ) ) {
-    /**
-     * Save team meta.
-     *
-     * @param int $post_id Post ID.
-     */
-    function clx_save_team_meta( $post_id ) {
-        if ( ! isset( $_POST['clx_team_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clx_team_nonce'] ) ), 'clx_save_team_meta' ) ) {
-            return;
-        }
-
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-            return;
-        }
-
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return;
-        }
-
-        if ( isset( $_POST['clx_team_role'] ) ) {
-            $team_role = sanitize_text_field( wp_unslash( $_POST['clx_team_role'] ) );
-            update_post_meta( $post_id, 'clx_team_role', $team_role );
-        }
-
-        if ( isset( $_POST['clx_team_hover_id'] ) ) {
-            $hover_id = clx_sanitize_media_id( wp_unslash( $_POST['clx_team_hover_id'] ) );
-            update_post_meta( $post_id, 'clx_team_hover_id', $hover_id );
-        }
+/**
+ * Save team meta data.
+ *
+ * @param int $post_id Post ID.
+ */
+function clx_save_team_meta( int $post_id ): void {
+    if ( ! isset( $_POST['clx_team_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['clx_team_meta_nonce'] ) ), 'clx_team_meta' ) ) {
+        return;
     }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $role     = isset( $_POST['clx_team_role'] ) ? sanitize_text_field( wp_unslash( $_POST['clx_team_role'] ) ) : '';
+    $hover_id = isset( $_POST['clx_team_hover_id'] ) ? absint( $_POST['clx_team_hover_id'] ) : 0;
+
+    update_post_meta( $post_id, 'team_role', $role );
+    update_post_meta( $post_id, 'team_hover_id', $hover_id );
 }
 add_action( 'save_post_clx_team', 'clx_save_team_meta' );
-
-if ( ! function_exists( 'clx_enqueue_cpt_admin_assets' ) ) {
-    /**
-     * Enqueue admin assets for CPT meta boxes.
-     *
-     * @param string $hook Current admin page hook.
-     */
-    function clx_enqueue_cpt_admin_assets( $hook ) {
-        global $typenow;
-
-        if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
-            return;
-        }
-
-        if ( 'clx_team' !== $typenow ) {
-            return;
-        }
-
-        wp_enqueue_media();
-        wp_enqueue_script(
-            'clx-admin-meta',
-            trailingslashit( CLX_THEME_URI ) . 'assets/js/admin-meta.js',
-            [],
-            CLX_THEME_VERSION,
-            true
-        );
-    }
-}
-add_action( 'admin_enqueue_scripts', 'clx_enqueue_cpt_admin_assets' );

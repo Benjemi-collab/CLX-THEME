@@ -1,45 +1,47 @@
 <?php
 /**
- * Showreel section.
+ * Template part: showreel.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 
-$showreel_id  = absint( get_theme_mod( 'clx_showreel_video_id', 0 ) );
-$showreel_url = clx_media_url( $showreel_id );
-$showreel_mime = $showreel_id ? get_post_mime_type( $showreel_id ) : '';
+$showreel_video_id = absint( get_theme_mod( 'clx_showreel_video_id' ) );
+$hero_video_id     = absint( get_theme_mod( 'clx_hero_video_id' ) );
+$poster_id         = absint( get_theme_mod( 'clx_hero_poster_id' ) );
+$video_id_to_use   = $showreel_video_id ? $showreel_video_id : $hero_video_id;
+$video_url         = $video_id_to_use ? clx_get_media_url( $video_id_to_use ) : '';
+$poster_data       = clx_get_image_data( $poster_id );
+$video_type        = '';
+
+if ( $video_url ) {
+$filetype  = wp_check_filetype( wp_basename( $video_url ), wp_get_mime_types() );
+$video_type = isset( $filetype['type'] ) ? $filetype['type'] : 'video/mp4';
+}
 ?>
-<section class="clx-section showreel-section" id="showreel" aria-labelledby="showreel-title">
-    <div class="clx-wrap">
-        <div class="section-header">
-            <h2 class="section-title" id="showreel-title"><?php esc_html_e( 'Showreel cinématique', 'clx' ); ?></h2>
-            <p class="section-subtitle"><?php esc_html_e( 'Une sélection de captations hybrides, expériences live et films produits par nos studios.', 'clx' ); ?></p>
-        </div>
-        <div class="showreel-media card-glass">
-            <?php if ( $showreel_url ) : ?>
-                <video class="showreel-video" controls preload="metadata">
-                    <source src="<?php echo esc_url( $showreel_url ); ?>"<?php if ( $showreel_mime ) : ?> type="<?php echo esc_attr( $showreel_mime ); ?>"<?php endif; ?>>
-                    <?php esc_html_e( 'Votre navigateur ne supporte pas la lecture vidéo.', 'clx' ); ?>
-                </video>
-            <?php else : ?>
-                <div class="showreel-placeholder">
-                    <p><?php esc_html_e( 'Ajoutez votre vidéo showreel depuis le Customizer pour la diffuser ici.', 'clx' ); ?></p>
-                </div>
-            <?php endif; ?>
-        </div>
-        <div class="showreel-meta">
-            <div class="meta-block">
-                <span class="meta-label"><?php esc_html_e( 'Studios', 'clx' ); ?></span>
-                <span class="meta-value"><?php esc_html_e( 'Paris & Montréal', 'clx' ); ?></span>
-            </div>
-            <div class="meta-block">
-                <span class="meta-label"><?php esc_html_e( 'Formats', 'clx' ); ?></span>
-                <span class="meta-value"><?php esc_html_e( 'Ultra HD, XR, Live 4K', 'clx' ); ?></span>
-            </div>
-            <div class="meta-block">
-                <span class="meta-label"><?php esc_html_e( 'Disponibilités', 'clx' ); ?></span>
-                <span class="meta-value"><?php esc_html_e( 'Sous 2 semaines', 'clx' ); ?></span>
-            </div>
-        </div>
-    </div>
+<section class="clx-section showreel-section" id="clx-showreel" aria-labelledby="clx-showreel-title">
+<div class="clx-wrap">
+<div class="showreel-grid">
+<div class="showreel-player">
+<?php if ( $video_url ) : ?>
+<video controls preload="metadata" playsinline<?php if ( $poster_data['src'] ) : ?> poster="<?php echo esc_url( $poster_data['src'] ); ?>"<?php endif; ?>>
+<source src="<?php echo esc_url( $video_url ); ?>" type="<?php echo esc_attr( $video_type ); ?>">
+</video>
+<?php elseif ( $poster_data['src'] ) : ?>
+<img src="<?php echo esc_url( $poster_data['src'] ); ?>" alt="<?php echo esc_attr( $poster_data['alt'] ? $poster_data['alt'] : __( 'Showreel CLX', 'clx' ) ); ?>"<?php if ( $poster_data['srcset'] ) : ?> srcset="<?php echo esc_attr( $poster_data['srcset'] ); ?>"<?php endif; ?><?php if ( $poster_data['sizes'] ) : ?> sizes="<?php echo esc_attr( $poster_data['sizes'] ); ?>"<?php endif; ?>>
+<?php else : ?>
+<div class="hero-placeholder" role="img" aria-label="<?php esc_attr_e( 'Showreel CLX', 'clx' ); ?>">
+<span class="placeholder-grid" aria-hidden="true"></span>
+</div>
+<?php endif; ?>
+</div>
+<div class="showreel-copy">
+<h2 class="section-title" id="clx-showreel-title"><?php esc_html_e( 'Showreel 2024', 'clx' ); ?></h2>
+<p><?php esc_html_e( 'Plateaux XR, captations hybrides, hologrammes événementiels et storytelling social : découvrez notre palette cinématique.', 'clx' ); ?></p>
+<p><?php esc_html_e( 'Chaque séquence est mixée en Dolby Atmos et livrée en versions adaptées aux écrans mobiles, LED walls et flux live.', 'clx' ); ?></p>
+<a class="btn-cam btn-ghost" href="<?php echo esc_url( home_url( '/#clx-contact' ) ); ?>">
+<span class="btn-label"><?php esc_html_e( 'Booker une session de vision', 'clx' ); ?></span>
+</a>
+</div>
+</div>
+</div>
 </section>

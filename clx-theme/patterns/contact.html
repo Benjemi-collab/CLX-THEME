@@ -1,52 +1,30 @@
 <section class="clx-section contact-section" aria-labelledby="pattern-contact-title">
-    <div class="clx-wrap contact-grid">
-        <div class="contact-intro card-glass">
-            <span class="badge badge-soft"><span class="dot" aria-hidden="true"></span>Prendre rendez-vous</span>
-            <h2 class="section-title" id="pattern-contact-title">Parlons de votre lancement</h2>
-            <p class="section-subtitle">Décrivez votre projet, nous revenons vers vous sous 24h.</p>
-            <ul class="contact-list">
-                <li>Calendrier de production optimisé</li>
-                <li>Roadmap média &amp; contenus prête à partager</li>
-                <li>Estimate budgétaire détaillé</li>
-            </ul>
-            <div class="contact-meta">
-                <a class="pill-cta" href="mailto:bonjour@clx.agency">bonjour@clx.agency</a>
-                <a class="pill-outline" href="tel:+33184260000">+33 1 84 26 00 00</a>
-            </div>
-        </div>
-        <form class="contact-form card-glass" action="#" method="post">
-            <div class="form-group">
-                <label for="pattern-contact-name">Nom &amp; prénom</label>
-                <input type="text" id="pattern-contact-name" name="contact-name" required />
-            </div>
-            <div class="form-group">
-                <label for="pattern-contact-email">Email professionnel</label>
-                <input type="email" id="pattern-contact-email" name="contact-email" required />
-            </div>
-            <div class="form-group">
-                <label for="pattern-contact-company">Entreprise</label>
-                <input type="text" id="pattern-contact-company" name="contact-company" />
-            </div>
-            <div class="form-group">
-                <label for="pattern-contact-message">Votre besoin</label>
-                <textarea id="pattern-contact-message" name="contact-message" rows="4" required></textarea>
-            </div>
-            <div class="form-group form-group-inline">
-                <label for="pattern-contact-budget">Budget indicatif</label>
-                <select id="pattern-contact-budget" name="contact-budget">
-                    <option value="">Sélectionner</option>
-                    <option value="8500-15000">8 500€ - 15 000€</option>
-                    <option value="15000-30000">15 000€ - 30 000€</option>
-                    <option value="30000+">30 000€ et plus</option>
-                </select>
-            </div>
-            <div class="form-group consent">
-                <label class="checkbox">
-                    <input type="checkbox" name="contact-consent" required />
-                    <span>J'accepte d'être contacté·e par l'équipe CLX.</span>
-                </label>
-            </div>
-            <button class="pill-cta" type="submit">Envoyer ma demande</button>
-        </form>
-    </div>
+	<div class="clx-wrap">
+		<div class="section-header">
+			<h2 class="section-title" id="pattern-contact-title">On tourne quand ?</h2>
+			<p class="section-subtitle">Brief express, repérage, démo live : réponse sous 24 h.</p>
+		</div>
+		<div class="contact-grid">
+			<div class="contact-card">
+				<p>CLX — 42 rue du Cinéma, Paris</p>
+				<ul class="contact-links">
+					<li><a href="tel:+33102030405">+33 (0)1 02 03 04 05</a></li>
+					<li><a href="mailto:studio@clx.agency">studio@clx.agency</a></li>
+					<li><a href="https://www.linkedin.com/company/clx">LinkedIn</a></li>
+				</ul>
+			</div>
+			<form class="contact-card contact-form">
+				<label for="pattern-contact-name">Nom &amp; prénom</label>
+				<input id="pattern-contact-name" type="text" placeholder="Votre nom">
+				<label for="pattern-contact-mail">Email</label>
+				<input id="pattern-contact-mail" type="email" placeholder="vous@clx.com">
+				<label for="pattern-contact-message">Projet</label>
+				<textarea id="pattern-contact-message" rows="4"></textarea>
+				<button class="btn-cam btn-primary" type="button">
+					<span class="btn-dot" aria-hidden="true"></span>
+					<span class="btn-label">Envoyer le brief</span>
+				</button>
+			</form>
+		</div>
+	</div>
 </section>

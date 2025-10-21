@@ -1,84 +1,72 @@
 <?php
 /**
- * Pricing slider section.
+ * Template part: pricing slider.
  *
- * @package CLX\Theme
+ * @package CLX
  */
 ?>
-<section class="clx-section pricing-section" id="formules" aria-labelledby="pricing-title">
+<section class="clx-section pricing-section" id="clx-pricing" aria-labelledby="clx-pricing-title">
     <div class="clx-wrap">
         <div class="section-header">
-            <h2 class="section-title" id="pricing-title"><?php esc_html_e( 'Formules pour accélérer vos campagnes', 'clx' ); ?></h2>
-            <p class="section-subtitle"><?php esc_html_e( 'Trois modules marketing cumulables pour délivrer votre narration de lancement sans friction.', 'clx' ); ?></p>
+            <h2 class="section-title" id="clx-pricing-title"><?php esc_html_e( 'Studios &amp; packs ciné', 'clx' ); ?></h2>
+            <p class="section-subtitle"><?php esc_html_e( 'Choisissez la capsule idéale, nous ajustons l’équipe live et la post-prod pour chaque activation.', 'clx' ); ?></p>
         </div>
-        <div class="clx-3d-slider" data-slider="pricing" aria-labelledby="pricing-title">
-            <button class="slider-nav slider-nav-prev pill-ghost" type="button" aria-label="<?php echo esc_attr__( 'Voir l\'offre précédente', 'clx' ); ?>">
-                <span aria-hidden="true">&#8592;</span>
+        <div class="pricing-shell">
+            <button class="slider-nav pricing-prev" type="button" aria-label="<?php esc_attr_e( 'Offre précédente', 'clx' ); ?>" data-target="clx-pricing-track">
+                <span aria-hidden="true">&#10094;</span>
             </button>
-            <div class="clx-3d-track" role="listbox" aria-live="polite">
-                <article class="clx-3d-slide is-left" role="option" aria-label="<?php echo esc_attr__( 'Launch Capsule', 'clx' ); ?>">
-                    <div class="pricing-card card-glass">
-                        <header class="pricing-card-header">
-                            <span class="badge badge-soft"><span class="dot" aria-hidden="true"></span><?php esc_html_e( 'Launch Capsule', 'clx' ); ?></span>
-                            <p class="pricing-tag"><?php esc_html_e( 'à partir de 8 500€', 'clx' ); ?></p>
-                        </header>
-                        <p class="pricing-intro"><?php esc_html_e( 'Un sprint créatif pour capter l\'attention de votre audience sur 10 jours.', 'clx' ); ?></p>
-                        <ul class="pricing-list">
-                            <li><?php esc_html_e( 'Repérages & tournage mono-lieu 4K', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Montage vertical + horizontal', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Kit diffusion social + paid', 'clx' ); ?></li>
-                        </ul>
-                        <a class="pill-cta" href="<?php echo esc_url( '#contact' ); ?>"><?php esc_html_e( 'Réserver un créneau', 'clx' ); ?></a>
-                    </div>
-                </article>
-                <article class="clx-3d-slide is-center" role="option" aria-label="<?php echo esc_attr__( 'Experience Live', 'clx' ); ?>">
-                    <div class="pricing-card card-glass is-featured">
-                        <header class="pricing-card-header">
-                            <span class="badge badge-soft"><span class="dot" aria-hidden="true"></span><?php esc_html_e( 'Experience Live', 'clx' ); ?></span>
-                            <p class="pricing-tag"><?php esc_html_e( 'à partir de 16 900€', 'clx' ); ?></p>
-                        </header>
-                        <p class="pricing-intro"><?php esc_html_e( 'Production multi-cam, set design et diffusion live pour dévoiler votre produit en direct.', 'clx' ); ?></p>
-                        <ul class="pricing-list">
-                            <li><?php esc_html_e( 'Régie broadcast & réalisation live', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Captation audio binaurale & mixage', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Plateforme de streaming brandée', 'clx' ); ?></li>
-                        </ul>
-                        <a class="pill-cta" href="<?php echo esc_url( '#contact' ); ?>"><?php esc_html_e( 'Planifier une démo', 'clx' ); ?></a>
-                    </div>
-                </article>
-                <article class="clx-3d-slide is-right" role="option" aria-label="<?php echo esc_attr__( 'Cinéverse Access', 'clx' ); ?>">
-                    <div class="pricing-card card-glass">
-                        <header class="pricing-card-header">
-                            <span class="badge badge-soft"><span class="dot" aria-hidden="true"></span><?php esc_html_e( 'Cinéverse Access', 'clx' ); ?></span>
-                            <p class="pricing-tag"><?php esc_html_e( 'à partir de 24 500€', 'clx' ); ?></p>
-                        </header>
-                        <p class="pricing-intro"><?php esc_html_e( 'Expérience immersive phygitale avec showroom XR, diffusion metaverse et analytics live.', 'clx' ); ?></p>
-                        <ul class="pricing-list">
-                            <li><?php esc_html_e( 'Scénographie XR & hologrammes', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Captations 360° & réalité mixte', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Command center performance 24/7', 'clx' ); ?></li>
-                        </ul>
-                        <a class="pill-cta" href="<?php echo esc_url( '#contact' ); ?>"><?php esc_html_e( 'Lancer mon cinéverse', 'clx' ); ?></a>
-                    </div>
-                </article>
-                <article class="clx-3d-slide is-far" role="option" aria-label="<?php echo esc_attr__( 'Upgrade on-demand', 'clx' ); ?>">
-                    <div class="pricing-card card-glass">
-                        <header class="pricing-card-header">
-                            <span class="badge badge-soft"><span class="dot" aria-hidden="true"></span><?php esc_html_e( 'Upgrade on-demand', 'clx' ); ?></span>
-                            <p class="pricing-tag"><?php esc_html_e( 'options à la carte', 'clx' ); ?></p>
-                        </header>
-                        <p class="pricing-intro"><?php esc_html_e( 'Renforts créatifs & technos additionnels pour amplifier vos activations existantes.', 'clx' ); ?></p>
-                        <ul class="pricing-list">
-                            <li><?php esc_html_e( 'Social war room & community care', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Influence & relations presse ciné', 'clx' ); ?></li>
-                            <li><?php esc_html_e( 'Dashboards data studio personnalisés', 'clx' ); ?></li>
-                        </ul>
-                        <a class="pill-outline" href="<?php echo esc_url( '#contact' ); ?>"><?php esc_html_e( 'Composer mon module', 'clx' ); ?></a>
-                    </div>
-                </article>
-            </div>
-            <button class="slider-nav slider-nav-next pill-ghost" type="button" aria-label="<?php echo esc_attr__( 'Voir l\'offre suivante', 'clx' ); ?>">
-                <span aria-hidden="true">&#8594;</span>
+            <ul class="pricing-track" id="clx-pricing-track" role="listbox" aria-labelledby="clx-pricing-title">
+                <li class="pricing-card is-left" data-index="0" role="option" aria-selected="false">
+                    <span class="pricing-badge"><?php esc_html_e( 'Pulse', 'clx' ); ?></span>
+                    <h3 class="pricing-title"><?php esc_html_e( 'Live Social', 'clx' ); ?></h3>
+                    <p class="pricing-price">1 900 €</p>
+                    <p class="pricing-meta"><?php esc_html_e( '1/2 journée – 2 opérateurs', 'clx' ); ?></p>
+                    <ul class="pricing-list">
+                        <li><?php esc_html_e( 'Multi-cam vertical &amp; format carré', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Habillage live + modération chat', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Export express stories &amp; reels', 'clx' ); ?></li>
+                    </ul>
+                </li>
+                <li class="pricing-card is-center" data-index="1" role="option" aria-selected="true">
+                    <span class="pricing-badge"><?php esc_html_e( 'Climax', 'clx' ); ?></span>
+                    <h3 class="pricing-title"><?php esc_html_e( 'Plateau premium', 'clx' ); ?></h3>
+                    <p class="pricing-price">4 600 €</p>
+                    <p class="pricing-meta"><?php esc_html_e( '1 journée – 5 talents', 'clx' ); ?></p>
+                    <ul class="pricing-list">
+                        <li><?php esc_html_e( 'Régie mobile HDR &amp; light design', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Chef opérateur, steadicam &amp; drone', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Motion kit &amp; bande sonore originale', 'clx' ); ?></li>
+                    </ul>
+                    <a class="btn-cam btn-primary" href="<?php echo esc_url( home_url( '/#clx-contact' ) ); ?>">
+                        <span class="btn-dot" aria-hidden="true"></span>
+                        <span class="btn-label"><?php esc_html_e( 'Réserver le studio', 'clx' ); ?></span>
+                    </a>
+                </li>
+                <li class="pricing-card is-right" data-index="2" role="option" aria-selected="false">
+                    <span class="pricing-badge"><?php esc_html_e( 'Chrono', 'clx' ); ?></span>
+                    <h3 class="pricing-title"><?php esc_html_e( 'Sprint contenu', 'clx' ); ?></h3>
+                    <p class="pricing-price">2 800 €</p>
+                    <p class="pricing-meta"><?php esc_html_e( '1 journée – 3 tournages', 'clx' ); ?></p>
+                    <ul class="pricing-list">
+                        <li><?php esc_html_e( 'Équipe mobile 4K + audio sans fil', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Set multi-décors &amp; fond LED', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Montages cut en 48h', 'clx' ); ?></li>
+                    </ul>
+                </li>
+                <li class="pricing-card is-far" data-index="3" role="option" aria-selected="false">
+                    <span class="pricing-badge"><?php esc_html_e( 'Aurora', 'clx' ); ?></span>
+                    <h3 class="pricing-title"><?php esc_html_e( 'Expérience immersive', 'clx' ); ?></h3>
+                    <p class="pricing-price">8 900 €</p>
+                    <p class="pricing-meta"><?php esc_html_e( '2 jours – live + aftermovie', 'clx' ); ?></p>
+                    <ul class="pricing-list">
+                        <li><?php esc_html_e( 'Réalité mixte &amp; captation volumétrique', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Diffusion simultanée showroom &amp; metaverse', 'clx' ); ?></li>
+                        <li><?php esc_html_e( 'Reporting interactif + data room', 'clx' ); ?></li>
+                    </ul>
+                </li>
+            </ul>
+            <button class="slider-nav pricing-next" type="button" aria-label="<?php esc_attr_e( 'Offre suivante', 'clx' ); ?>" data-target="clx-pricing-track">
+                <span aria-hidden="true">&#10095;</span>
             </button>
         </div>
     </div>
